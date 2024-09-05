@@ -31,3 +31,8 @@ tkcalendar==1.6.1
 typing_extensions==4.12.2
 urllib3==2.2.2
 Werkzeug==3.0.4
+Flask
+Flask-SQLAlchemy
+Flask-Login
+python-dotenv
+gunicorn
