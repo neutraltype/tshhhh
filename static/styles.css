@@ -1,13 +1,10 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
 }
 
 header {
-    background: #f8f9fa;
-    padding: 1rem;
-    text-align: center;
+    background-color: #f4f4f4;
+    padding: 10px;
 }
 
 nav ul {
@@ -17,58 +14,12 @@ nav ul {
 
 nav ul li {
     display: inline;
-    margin: 0 0.5rem;
+    margin-right: 10px;
 }
 
-nav ul li a {
-    text-decoration: none;
-    color: #007bff;
-}
-
-main {
-    padding: 1rem;
-}
-
-h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-form {
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"] {
-    width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-input[type="submit"] {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-}
-
-input[type="submit"]:hover {
-    background-color: #0056b3;
-}
-
-.flash-messages {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 0.75rem;
-    border-radius: 0.25rem;
+.flash-messages .flash {
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
 .flash.success {
@@ -79,4 +30,33 @@ input[type="submit"]:hover {
 .flash.error {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+footer {
+    background-color: #f4f4f4;
+    padding: 10px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.month-navigation {
+    text-align: right;
+    margin-top: 20px;
 }

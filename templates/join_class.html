@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Приєднатися до класу</h1>
-    <form action="{{ url_for('join_class') }}" method="POST">
+    {% extends 'index.html' %}
+    {% block content %}
+    <h2>Приєднатися до класу</h2>
+    <form method="POST">
         <label for="class_id">ID класу:</label>
         <input type="text" id="class_id" name="class_id" required>
-        <br>
-        <input type="submit" value="Приєднатися">
+        
+        <button type="submit">Приєднатися</button>
     </form>
-    <a href="{{ url_for('index') }}">Назад на головну</a>
+    {% endblock %}
 </body>
 </html>

@@ -7,13 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Створити клас</h1>
-    <form action="{{ url_for('create_class') }}" method="POST">
+    {% extends 'index.html' %}
+    {% block content %}
+    <h2>Створити новий клас</h2>
+    <form method="POST">
         <label for="class_name">Назва класу:</label>
         <input type="text" id="class_name" name="class_name" required>
-        <br>
-        <input type="submit" value="Створити клас">
+        
+        <button type="submit">Створити</button>
     </form>
-    <a href="{{ url_for('index') }}">Назад на головну</a>
+    {% endblock %}
 </body>
 </html>

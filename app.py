@@ -39,13 +39,20 @@ class Class(db.Model):
     name = db.Column(db.String(100), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     students = db.relationship('User', backref='classroom', lazy=True)
+    subjects = db.relationship('Subject', backref='class', lazy=True)
+
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
+    grades = db.relationship('Grade', backref='subject', lazy=True)
 
 class Grade(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    subject = db.Column(db.String(100), nullable=False)
-    score = db.Column(db.Float, nullable=False)
-    month = db.Column(db.String(20), nullable=False)  # Format: YYYY-MM
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
+    month = db.Column(db.String(20), nullable=False)
+    grade = db.Column(db.Integer, nullable=False)
 
 # Загрузка пользователя
 @login_manager.user_loader
@@ -65,17 +72,17 @@ def register():
         email = request.form['email']
         password = request.form['password']
         is_teacher = 'is_teacher' in request.form
-        
-        new_user = User(username=username, email=email, role='teacher' if is_teacher else 'student')
+        role = 'teacher' if is_teacher else 'student'
+        new_user = User(username=username, email=email, role=role)
         new_user.set_password(password)
         try:
             db.session.add(new_user)
             db.session.commit()
             flash('Реєстрація пройшла успішно!', 'success')
-            if is_teacher:
-                return redirect(url_for('create_class'))
-            else:
+            if role == 'student':
                 return redirect(url_for('join_class'))
+            else:
+                return redirect(url_for('create_class'))
         except:
             flash('Помилка під час реєстрації. Спробуйте іншу електронну пошту.', 'error')
     return render_template('register.html')
@@ -116,7 +123,7 @@ def create_class():
         db.session.add(new_class)
         db.session.commit()
         flash('Клас успішно створено!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('manage_class', class_id=new_class.id))
 
     return render_template('create_class.html')
 
@@ -134,20 +141,45 @@ def join_class():
         student.classroom_id = class_id
         db.session.commit()
         flash('Ви приєдналися до класу!', 'success')
-        return redirect(url_for('index'))
+        return redirect(url_for('view_grades'))
 
     return render_template('join_class.html')
 
-# Оценки
-@app.route('/grades')
+# Управление классом (для учителей)
+@app.route('/manage_class/<int:class_id>', methods=['GET', 'POST'])
 @login_required
-def grades():
-    if current_user.role == 'teacher':
-        grades = Grade.query.all()  # Show all grades for teacher
-    else:
-        grades = Grade.query.filter_by(student_id=current_user.id).all()  # Show grades for the current student
+def manage_class(class_id):
+    if current_user.role != 'teacher':
+        flash('Тільки вчитель може управляти класами', 'error')
+        return redirect(url_for('index'))
 
-    return render_template('grades.html', grades=grades)
+    class_ = Class.query.get_or_404(class_id)
+    if request.method == 'POST':
+        subject_name = request.form['subject_name']
+        new_subject = Subject(name=subject_name, class_id=class_.id)
+        db.session.add(new_subject)
+        db.session.commit()
+        flash('Предмет успішно додано!', 'success')
+        return redirect(url_for('manage_class', class_id=class_.id))
+
+    subjects = Subject.query.filter_by(class_id=class_.id).all()
+    return render_template('manage_class.html', class_=class_, subjects=subjects)
+
+# Просмотр оценок (для студентов)
+@app.route('/view_grades', methods=['GET'])
+@login_required
+def view_grades():
+    if current_user.role != 'student':
+        flash('Тільки студент може переглядати оцінки', 'error')
+        return redirect(url_for('index'))
+
+    if not current_user.classroom_id:
+        flash('Вам потрібно приєднатися до класу, щоб переглядати оцінки.', 'error')
+        return redirect(url_for('join_class'))
+
+    student_grades = Grade.query.filter_by(student_id=current_user.id).all()
+    subjects = Subject.query.join(Class).filter(Class.id == current_user.classroom_id).all()
+    return render_template('view_grades.html', grades=student_grades, subjects=subjects)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оцінки</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% extends 'index.html' %}
+    {% block content %}
+    <h2>Ваші оцінки</h2>
+    
+    <!-- Таблица с оценками -->
+    <table>
+        <thead>
+            <tr>
+                <th>Місяць</th>
+                {% for subject in subjects %}
+                    <th>{{ subject.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+                <tr>
+                    <td>{{ grade.month }}</td>
+                    {% for subject in subjects %}
+                        <td>
+                            {% if grade.subject_id == subject.id %}
+                                {{ grade.grade }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Навигация по месяцам -->
+    <div class="month-navigation">
+        <button>&lt;</button>
+        <span>Текущий месяц</span>
+        <button>&gt;</button>
+    </div>
+    
+    {% endblock %}
+</body>
+</html>

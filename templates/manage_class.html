@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управління класом</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    {% extends 'index.html' %}
+    {% block content %}
+    <h2>Управління класом: {{ class_.name }}</h2>
+    
+    <h3>Додати новий предмет</h3>
+    <form method="POST">
+        <label for="subject_name">Назва предмету:</label>
+        <input type="text" id="subject_name" name="subject_name" required>
+        
+        <button type="submit">Додати</button>
+    </form>
+    
+    <h3>Оцінки за предметами</h3>
+    <!-- Здесь можно добавить таблицу для оценки -->
+    {% endblock %}
+</body>
+</html>
