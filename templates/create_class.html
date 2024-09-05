@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создание класса</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Создание класса</h1>
-    <form action="{{ url_for('create_class') }}" method="POST">
-        <label for="class_name">Название класса:</label>
-        <input type="text" id="class_name" name="class_name" required>
-        <br>
-        <input type="submit" value="Создать класс">
+    <h1>Создать новый класс</h1>
+    <form method="POST">
+        <input type="text" name="class_name" placeholder="Название класса" required>
+        <button type="submit">Создать</button>
     </form>
-    <a href="{{ url_for('index') }}">Назад на главную</a>
+    <a href="{{ url_for('index') }}">Назад</a>
 </body>
 </html>
