@@ -1,12 +1,19 @@
-{% extends "index.html" %}
-
-{% block content %}
-    <h2>Создать класс</h2>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Створити клас</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Створити клас</h1>
     <form action="{{ url_for('create_class') }}" method="POST">
-        <label for="class_name">Название класса:</label>
+        <label for="class_name">Назва класу:</label>
         <input type="text" id="class_name" name="class_name" required>
         <br>
-        <input type="submit" value="Создать класс">
+        <input type="submit" value="Створити клас">
     </form>
-    <a href="{{ url_for('index') }}">Назад на главную</a>
-{% endblock %}
+    <a href="{{ url_for('index') }}">Назад на головну</a>
+</body>
+</html>

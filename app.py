@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # Переход на страницу логина, если пользователь не аутентифицирован
+login_manager.login_view = 'login'
 
 # Определение моделей базы данных
 class User(UserMixin, db.Model):
@@ -50,7 +50,7 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
-# Регистрация
+# Регистрация учителя
 @app.route('/register_teacher', methods=['GET', 'POST'])
 def register_teacher():
     if request.method == 'POST':
@@ -62,11 +62,29 @@ def register_teacher():
         try:
             db.session.add(new_teacher)
             db.session.commit()
-            flash('Регистрация прошла успешно!', 'success')
+            flash('Реєстрація пройшла успішно!', 'success')
             return redirect(url_for('login'))
         except:
-            flash('Ошибка при регистрации. Попробуйте другой email.', 'error')
+            flash('Помилка під час реєстрації. Спробуйте іншу електронну пошту.', 'error')
     return render_template('register_teacher.html')
+
+# Регистрация студента
+@app.route('/register_student', methods=['GET', 'POST'])
+def register_student():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        new_student = User(username=username, email=email, role='student')
+        new_student.set_password(password)
+        try:
+            db.session.add(new_student)
+            db.session.commit()
+            flash('Реєстрація пройшла успішно!', 'success')
+            return redirect(url_for('login'))
+        except:
+            flash('Помилка під час реєстрації. Спробуйте іншу електронну пошту.', 'error')
+    return render_template('register_student.html')
 
 # Логин
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,11 +95,9 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             login_user(user)
-            session['role'] = user.role
-            flash('Вход выполнен успешно!', 'success')
             return redirect(url_for('index'))
         else:
-            flash('Неверная электронная почта или пароль', 'error')
+            flash('Неправильна електронна пошта або пароль', 'error')
     return render_template('login.html')
 
 # Логаут
@@ -89,43 +105,45 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.pop('role', None)
-    flash('Вы вышли из системы.', 'info')
+    flash('Ви вийшли з системи.', 'info')
     return redirect(url_for('index'))
 
 # Создание класса (только для учителей)
 @app.route('/create_class', methods=['GET', 'POST'])
 @login_required
 def create_class():
-    if current_user.role == 'teacher':
-        if request.method == 'POST':
-            class_name = request.form['class_name']
-            new_class = Class(name=class_name, teacher_id=current_user.id)
-            db.session.add(new_class)
-            db.session.commit()
-            flash('Класс успешно создан!', 'success')
-            return redirect(url_for('index'))
-        return render_template('create_class.html')
-    else:
-        flash('Доступ запрещен', 'error')
+    if current_user.role != 'teacher':
+        flash('Тільки вчитель може створювати класи', 'error')
         return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        class_name = request.form['class_name']
+        new_class = Class(name=class_name, teacher_id=current_user.id)
+        db.session.add(new_class)
+        db.session.commit()
+        flash('Клас успішно створено!', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('create_class.html')
 
 # Присоединение к классу (только для студентов)
 @app.route('/join_class', methods=['GET', 'POST'])
 @login_required
 def join_class():
-    if current_user.role == 'student':
-        if request.method == 'POST':
-            class_id = request.form['class_id']
-            student = User.query.get(current_user.id)
-            student.classroom_id = class_id
-            db.session.commit()
-            flash('Вы присоединились к классу!', 'success')
-            return redirect(url_for('index'))
-        return render_template('join_class.html')
-    else:
-        flash('Доступ запрещен', 'error')
+    if current_user.role != 'student':
+        flash('Тільки студент може приєднуватися до класів', 'error')
         return redirect(url_for('index'))
 
+    if request.method == 'POST':
+        class_id = request.form['class_id']
+        student = User.query.get(current_user.id)
+        student.classroom_id = class_id
+        db.session.commit()
+        flash('Ви приєдналися до класу!', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('join_class.html')
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
