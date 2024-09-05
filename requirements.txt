@@ -8,7 +8,7 @@ colorama==0.4.6
 Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 greenlet==3.0.3
-gunicorn==20.1.0  # <-- Добавьте эту строку
+gunicorn==23.0.0
 idna==3.7
 itsdangerous==2.2.0
 Jinja2==3.1.4
@@ -20,6 +20,7 @@ pygame==2.5.2
 pyinstaller==6.4.0
 pyinstaller-hooks-contrib==2024.2
 PySimpleGUI==5.0.2
+python-dotenv==1.0.1
 pywin32-ctypes==0.2.2
 requests==2.32.3
 rsa==4.9
