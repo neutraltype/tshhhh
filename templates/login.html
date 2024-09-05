@@ -1,15 +1,22 @@
-{% extends "index.html" %}
-
-{% block content %}
-    <h2>Вход</h2>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вхід</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Вхід</h1>
     <form action="{{ url_for('login') }}" method="POST">
-        <label for="email">Электронная почта:</label>
+        <label for="email">Електронна пошта:</label>
         <input type="email" id="email" name="email" required>
         <br>
         <label for="password">Пароль:</label>
         <input type="password" id="password" name="password" required>
         <br>
-        <input type="submit" value="Войти">
+        <input type="submit" value="Увійти">
     </form>
-    <a href="{{ url_for('index') }}">Назад на главную</a>
-{% endblock %}
+    <a href="{{ url_for('index') }}">Назад на головну</a>
+</body>
+</html>
