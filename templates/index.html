@@ -12,11 +12,13 @@
         <nav>
             <ul>
                 <li><a href="{{ url_for('index') }}">Головна</a></li>
-                <li><a href="{{ url_for('register_teacher') }}">Реєстрація вчителя</a></li>
-                <li><a href="{{ url_for('login') }}">Увійти</a></li>
-                <li><a href="{{ url_for('create_class') }}">Створити клас</a></li>
-                <li><a href="{{ url_for('join_class') }}">Приєднатися до класу</a></li>
-                {% if current_user.is_authenticated %}
+                {% if not current_user.is_authenticated %}
+                    <li><a href="{{ url_for('login') }}">Увійти</a></li>
+                    <li><a href="{{ url_for('register') }}">Реєстрація</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('create_class') }}">Створити клас</a></li>
+                    <li><a href="{{ url_for('join_class') }}">Приєднатися до класу</a></li>
+                    <li><a href="{{ url_for('grades') }}">Оцінки</a></li>
                     <li><a href="{{ url_for('logout') }}">Вийти</a></li>
                 {% endif %}
             </ul>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оцінки</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Оцінки</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Місяць</th>
+                <th>Предмет</th>
+                <th>Оцінка</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for grade in grades %}
+                <tr>
+                    <td>{{ grade.month }}</td>
+                    <td>{{ grade.subject }}</td>
+                    <td>{{ grade.score }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('index') }}">Назад на головну</a>
+</body>
+</html>

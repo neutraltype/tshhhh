@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'login'  # Переход на страницу логина, если пользователь не аутентифицирован
 
 # Определение моделей базы данных
 class User(UserMixin, db.Model):
@@ -26,7 +26,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(50), nullable=False)  # teacher or student
-    classroom_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=True)
+    classroom_id = db.Column(db.Integer, db.ForeignKey('class.id'))
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -40,6 +40,13 @@ class Class(db.Model):
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     students = db.relationship('User', backref='classroom', lazy=True)
 
+class Grade(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
+    score = db.Column(db.Float, nullable=False)
+    month = db.Column(db.String(20), nullable=False)  # Format: YYYY-MM
+
 # Загрузка пользователя
 @login_manager.user_loader
 def load_user(user_id):
@@ -50,41 +57,28 @@ def load_user(user_id):
 def index():
     return render_template('index.html')
 
-# Регистрация учителя
-@app.route('/register_teacher', methods=['GET', 'POST'])
-def register_teacher():
+# Регистрация
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        new_teacher = User(username=username, email=email, role='teacher')
-        new_teacher.set_password(password)
+        is_teacher = 'is_teacher' in request.form
+        
+        new_user = User(username=username, email=email, role='teacher' if is_teacher else 'student')
+        new_user.set_password(password)
         try:
-            db.session.add(new_teacher)
+            db.session.add(new_user)
             db.session.commit()
             flash('Реєстрація пройшла успішно!', 'success')
-            return redirect(url_for('login'))
+            if is_teacher:
+                return redirect(url_for('create_class'))
+            else:
+                return redirect(url_for('join_class'))
         except:
             flash('Помилка під час реєстрації. Спробуйте іншу електронну пошту.', 'error')
-    return render_template('register_teacher.html')
-
-# Регистрация студента
-@app.route('/register_student', methods=['GET', 'POST'])
-def register_student():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        new_student = User(username=username, email=email, role='student')
-        new_student.set_password(password)
-        try:
-            db.session.add(new_student)
-            db.session.commit()
-            flash('Реєстрація пройшла успішно!', 'success')
-            return redirect(url_for('login'))
-        except:
-            flash('Помилка під час реєстрації. Спробуйте іншу електронну пошту.', 'error')
-    return render_template('register_student.html')
+    return render_template('register.html')
 
 # Логин
 @app.route('/login', methods=['GET', 'POST'])
@@ -144,6 +138,16 @@ def join_class():
 
     return render_template('join_class.html')
 
+# Оценки
+@app.route('/grades')
+@login_required
+def grades():
+    if current_user.role == 'teacher':
+        grades = Grade.query.all()  # Show all grades for teacher
+    else:
+        grades = Grade.query.filter_by(student_id=current_user.id).all()  # Show grades for the current student
+
+    return render_template('grades.html', grades=grades)
+
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True)
